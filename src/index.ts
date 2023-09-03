@@ -68,7 +68,10 @@ const worker: ExportedHandler<Bindings> = {
                         queryId: queryId
                     });
                     if (found) {
-                        return utils.reply(found);
+                        return utils.reply({
+                            data: found.data,
+                            f: false
+                        });
                     }
                     const remainingUrl = pathname.replace(new RegExp('^' + prefix), '');
                     const targetUrl = decodeURIComponent(remainingUrl);
@@ -91,7 +94,10 @@ const worker: ExportedHandler<Bindings> = {
                         queryId: queryId
                     });
                     if (inserted) {
-                        return utils.reply({ data: payload.data });
+                        return utils.reply({ 
+                            data: payload.data,
+                            f: true
+                        });
                     }
                     return utils.reply(inserted);
                 }
