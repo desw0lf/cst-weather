@@ -1,16 +1,15 @@
-name = "mongo-realm-worker"
-type = "javascript"
+name = "WORKER_NAME"
+main = "build/index.mjs"
 
 account_id = "CLOUDFLARE_ACCOUNT_ID"
-workers_dev = true # or zone_id = "<ZONE ID>" if you have one
+# workers_dev = true # or 
+zone_id = "CLOUDFLARE_ZONE_ID"
+compatibility_date = "2023-09-02"
 
 [build]
 command = "npm run build"
 
-[build.upload]
-dir = "build"
-main = "./index.mjs"
-format = "modules"
-
 [vars]
-REALM_APPID = "MONGODB_REALM_APPID"
+REALM_APPID = "REALM_APPID"
+TOMORROW_BASE_URL = "TOMORROW_BASE_URL"
+TOMORROW_API_KEY = "TOMORROW_API_KEY"
