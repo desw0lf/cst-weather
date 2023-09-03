@@ -45,6 +45,10 @@ const worker: ExportedHandler<Bindings> = {
             return utils.toError(`Unknown "${pathname}" URL;`, 404);
         }
 
+        if (method === "OPTIONS") {
+            return utils.toJSON(null, 204);
+        }
+
         const token = req.headers.get('authorization');
         if (!token) return utils.toError('Unauthorized.', 401);
 
