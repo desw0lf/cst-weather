@@ -38,8 +38,6 @@ const worker: ExportedHandler<Bindings> = {
         const pathname = url.pathname.replace(/[/]$/, '');
         const prefix = "/api/weather";
         const searchParams = url.searchParams;
-        searchParams.sort();
-        const queryId = searchParams.toString();
 
         if (!pathname.startsWith(prefix)) {
             return utils.toError(`Unknown "${pathname}" URL;`, 404);
@@ -49,8 +47,12 @@ const worker: ExportedHandler<Bindings> = {
             return utils.toJSON(null, 204);
         }
 
-        const token = req.headers.get('authorization');
+        const token = req.headers.get("authorization") || searchParams.get("apikey");
         if (!token) return utils.toError('Unauthorized.', 401);
+
+        searchParams.delete("apikey");
+        searchParams.sort();
+        const queryId = searchParams.toString();
 
         try {
             const credentials = Realm.Credentials.apiKey(token);
@@ -80,11 +82,15 @@ const worker: ExportedHandler<Bindings> = {
                     const remainingUrl = pathname.replace(new RegExp('^' + prefix), '');
                     const targetUrl = decodeURIComponent(remainingUrl);
                     function appendKey(sp: URLSearchParams) {
-                        sp.append("apikey", env.TOMORROW_API_KEY);
+                        sp.set("apikey", env.TOMORROW_API_KEY);
                         return sp;
                     }
                     const tomorrowSearchParams = appendKey(searchParams).toString();
-                    const response = await fetch(env.TOMORROW_BASE_URL + targetUrl + "?" + tomorrowSearchParams, { headers: utils.BASE_HEADERS });
+                    const response = await fetch(env.TOMORROW_BASE_URL + targetUrl + "?" + tomorrowSearchParams, { headers: {
+                        ...utils.BASE_HEADERS,
+                        "Accept-Encoding": "gzip",
+                        "Accept": "application/json"
+                    }});
                     const status = response.status;
                     if (status !== 200) {
                         return utils.toError(response.statusText, status);
