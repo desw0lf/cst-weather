@@ -97,12 +97,18 @@ const worker: ExportedHandler<Bindings> = {
                     }
                     const startTime = url.searchParams.get("startTime");
                     const payload: { data: Timelines["data"] } = await response.json();
-                    const inserted = await collection.insertOne({
+                    // const inserted = await collection.insertOne({
+                    //     startTime: { "$date" : startTime },
+                    //     owner: user.id,
+                    //     data: payload.data,
+                    //     queryId: queryId
+                    // });
+                    const inserted = await collection.updateOne({ queryId }, {
                         startTime: { "$date" : startTime },
                         owner: user.id,
                         data: payload.data,
                         queryId: queryId
-                    });
+                    }, { upsert: true });
                     if (inserted) {
                         return utils.reply({ 
                             data: payload.data,
